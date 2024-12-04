@@ -1,0 +1,26 @@
+/* Intro section styling */
+.intro {
+    text-align: center;
+    margin: 40px 0; /* Add top and bottom margin for spacing */
+}
+
+.intro h2 {
+    font-size: 2.5rem; /* Increase heading size */
+    color: #007bff; /* Primary color */
+    margin-bottom: 15px; /* Add space below the heading */
+}
+
+.intro p {
+    font-size: 1.1rem; /* Slightly larger font for the intro */
+    line-height: 1.6; /* Improved line height for readability */
+    margin: 10px 0; /* Top and bottom margin for separation */
+    padding: 0 20px; /* Side padding for better readability */
+}
+
+/* Ensure list items in features have proper spacing */
+.features li {
+    margin: 10px 0; /* Space between items */
+    padding-left: 1.2em; /* Space on the left */
+    position: relative; /* For pseudo-elements */
+    line-height: 1.5; /* Improved line height for readability */
+}

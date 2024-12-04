@@ -1,0 +1,31 @@
+doctype html
+html
+  head
+    title= title
+    link(rel="stylesheet" href="/css/register.css") 
+  body
+    .container
+      h1 Register Request
+      form(action="/auth/register" method="POST" id="registerForm")
+        .form-group
+          label(for="email") Email
+          input(type="email" id="email" name="email" required)
+        
+        .form-group
+          label(for="password") Password
+          input(type="password" id="password" name="password" required)
+        
+        .form-group
+          label(for="role") Role
+          select(name="role" id="role" required)
+            option(value="assistant") Assistant
+            option(value="manager") Manager
+            option(value="ceo") CEO
+            
+        button(type="submit" class="btn-submit") Register
+      
+      p Already registered? 
+        a(href="/auth/login") Login here.
+      
+    // Link to the JavaScript file
+    script(src="/js/register.js")

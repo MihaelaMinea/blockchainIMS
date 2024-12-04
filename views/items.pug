@@ -1,0 +1,43 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/css/items.css")   
+
+  body
+    .container
+      h1 #{title}
+      p View all items in your inventory below.
+
+      if items.length
+        table
+          thead
+            tr
+              th Index
+              th Name
+              th Description
+              th Supplier
+              th Price
+              th Quantity
+              th Category
+              th Date Received
+          tbody
+            each item, index in items
+              tr
+                td #{index + 1} 
+                td= item.name
+                td= item.description
+                td= item.supplier
+                td= (typeof item.price === 'number' ? `$${item.price.toFixed(2)}` : 'N/A')
+                td= item.quantity
+                td= item.category
+                td= new Date(item.dateReceived).toLocaleDateString()
+      else
+        p No items found in inventory. Please add some items.
+      
+      a(href="/api/items/new" class="btn") Add New Item
+
+       a(href="/auth/login" class="btn") Go to Login
+      a(href="/api/welcome" class="btn") Go to Welcome Page

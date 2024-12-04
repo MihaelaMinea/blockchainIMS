@@ -1,0 +1,151 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Container Styling */
+  .container {
+    max-width: 900px; /* Increased width for better layout */
+    margin: 20px auto;
+    padding: 20px;
+    border-radius: 10px; /* More rounded corners */
+    background-color: #ffffff; /* White background for better contrast */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow */
+  }
+  
+  /* Title */
+  h1 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 2.5rem; /* Larger title */
+  }
+  
+  /* Table Styling */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  th,
+  td {
+    padding: 12px; /* Increased padding for better touch targets */
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #007bff; /* Primary color for header */
+    color: #ffffff; /* White text */
+    font-weight: bold;
+  }
+  
+  td {
+    background-color: #f9f9f9; /* Light gray for table rows */
+  }
+  
+  /* Button Styling */
+  .btn {
+    display: inline-block;
+    padding: 12px 20px; /* Increased padding */
+    background-color: #28a745; /* Green for buttons */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px; /* More rounded corners */
+    font-weight: bold; /* Bold text */
+    transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+  }
+  
+  .btn:hover {
+    background-color: #218838; /* Darker green on hover */
+    transform: translateY(-2px); /* Lift effect */
+  }
+  
+  /* Form Styling */
+  .inventory-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  label {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  input,
+  textarea,
+  select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .container {
+      padding: 15px;
+    }
+  
+    h1 {
+      font-size: 2rem; /* Adjust heading size for small screens */
+    }
+  
+    input,
+    textarea,
+    select {
+      font-size: 14px;
+    }
+  
+    /* Responsive table design */
+    table,
+    thead,
+    tbody,
+    th,
+    td,
+    tr {
+      display: block; /* Block display for better mobile layout */
+    }
+  
+    th,
+    td {
+      padding: 8px;
+      text-align: left;
+    }
+  
+    th {
+      background-color: #007bff;
+      color: #fff;
+    }
+  
+    td {
+      background-color: #f9f9f9;
+      border-top: 1px solid #ddd;
+    }
+  
+    /* Align buttons properly on small screens */
+    .btn {
+      display: block;
+      width: 100%; /* Full width buttons */
+      text-align: center;
+      margin: 10px 0;
+    }
+  }
+  
+  /* Additional styling for no items message */
+  p {
+    text-align: center; /* Center the no items message */
+    color: #777; /* Lighter gray for the message */
+    margin-top: 20px; /* Spacing above the message */
+  }
+  

@@ -1,0 +1,120 @@
+/* Reset some default styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Full height container */
+.full-height {
+    min-height: 100vh; /* Ensures the container takes the full height of the viewport */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center horizontally */
+    background-color: #f4f4f4; /* Light background color */
+    font-family: Arial, sans-serif; /* Modern font */
+    color: #333; /* Darker text color for contrast */
+    padding-top: 50px; /* Adds 50px space from the top */
+}
+
+/* Main container */
+.container {
+    max-width: 450px; /* Increased max width for the login container */
+    width: 100%; /* Full width on smaller screens */
+    padding: 20px; /* Padding for spacing */
+    background-color: white; /* Background color for the main content */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 8px; /* Rounded corners */
+}
+
+/* Intro section styling */
+.intro {
+    text-align: center;
+    margin-bottom: 20px; /* Add bottom margin for spacing */
+}
+
+.intro h2 {
+    font-size: 2rem; /* Increase heading size */
+    color: #007bff; /* Primary color */
+    margin-bottom: 10px; /* Add space below the heading */
+}
+
+.intro p {
+    font-size: 1rem; /* Standard font size for instructions */
+    line-height: 1.5; /* Improved line height */
+}
+
+/* Form styling */
+.form-group {
+    margin-bottom: 15px; /* Space between form fields */
+}
+
+label {
+    display: block; /* Ensure label takes full width */
+    margin-bottom: 5px; /* Space below label */
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"], /* Added email input for registration */
+select {
+    width: 100%; /* Full width input fields */
+    padding: 10px; /* Padding for better click area */
+    border: 1px solid #ccc; /* Border style */
+    border-radius: 5px; /* Rounded corners */
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus { /* Focus styles for email input */
+    border-color: #007bff; /* Change border color on focus */
+    outline: none; /* Remove default outline */
+}
+
+/* Button styling */
+.btn {
+    padding: 14px 24px; /* Increased padding for better click area */
+    background-color: #007bff; /* Primary button color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none; /* Remove default border */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform for effect */
+    font-weight: bold; /* Bold text */
+    cursor: pointer; /* Pointer cursor on hover */
+    width: 100%; /* Full width for the button */
+}
+
+.btn:hover {
+    background-color: #0056b3; /* Darker color on hover */
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+.message-box {
+    position: fixed; /* Position fixed to the viewport */
+    top: 20px; /* Adjust top position */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Center the box */
+    padding: 15px; /* Add padding */
+    border-radius: 5px; /* Rounded corners */
+    z-index: 1000; /* Ensure it is above other elements */
+}
+
+.message-box.error {
+    background-color: #ffcccb; /* Light red background for error */
+    color: #d8000c; /* Dark red text color */
+}
+
+.message-box.success {
+    background-color: #d4edda; /* Light green background for success */
+    color: #155724; /* Dark green text color */
+}
+
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9em; /* Slightly larger font for footer */
+    color: #666; /* Darker gray */
+}

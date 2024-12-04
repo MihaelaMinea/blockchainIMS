@@ -1,0 +1,33 @@
+{
+  "name": "first-app",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js",
+    "prod": "node index.js"
+  },
+  "keywords": [],
+  "author": "Mihaela Minea",
+  "license": "ISC",
+  "description": "API for department 1 of the blockchain IMS",
+  "dependencies": {
+    "bcrypt": "^5.1.0",
+    "config": "^3.3.12",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-session": "^1.18.1",
+    "fabric-network": "^2.2.20",
+    "joi": "^17.13.3",
+    "mongoose": "^8.7.1",
+    "morgan": "^1.10.0",
+    "nano": "^10.1.4",
+    "node-couchdb": "^2.0.0",
+    "node-fetch": "^3.3.2",
+    "nodemon": "^3.1.7",
+    "pug": "^3.0.3"
+  },
+  "devDependencies": {
+    "jshint": "^2.13.6"
+  }
+}

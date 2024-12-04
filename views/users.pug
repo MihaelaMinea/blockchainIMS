@@ -1,0 +1,29 @@
+// views/users.pug
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/styles.css') 
+    body
+        h1 Registered Users
+        table
+            thead
+                tr
+                    th Email
+                    th Role
+                    th Actions
+            tbody
+                each user in users
+                    tr
+                        td= user.email
+                        td= user.role
+                        td
+                            a(href=`/auth/delete/${user._id}`) 
+
+                            // Example layout.pug
+nav
+
+    a(href='/auth/login')    ////   Login   ////    
+    a(href='/auth/register') Register   ////   
+    a(href='/auth/users') Users    ////    
+

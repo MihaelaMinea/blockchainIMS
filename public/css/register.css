@@ -1,0 +1,99 @@
+/* register.css */
+
+/* General Container Styles */
+.container {
+    max-width: 400px; /* Limit the width of the form */
+    margin: 50px auto; /* Center the container */
+    padding: 20px; /* Add some padding */
+    background-color: white; /* Light background color for the form */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+}
+
+/* Headings */
+h1 {
+    text-align: center; /* Center the heading */
+    color: #343a40; /* Dark color for the heading */
+}
+
+/* Form Group Styles */
+.form-group {
+    margin-bottom: 15px; /* Spacing between form groups */
+}
+
+/* Label Styles */
+label {
+    display: block; /* Make labels block elements */
+    margin-bottom: 5px; /* Space between label and input */
+    color: #495057; /* Color for labels */
+}
+
+/* Input Styles */
+input[type="email"],
+input[type="password"],
+select {
+    width: 100%; /* Full width */
+    padding: 10px; /* Padding inside the input */
+    border: 1px solid #ced4da; /* Border color */
+    border-radius: 4px; /* Rounded edges */
+    font-size: 16px; /* Font size */
+}
+
+/* Button Styles */
+.btn-submit {
+    width: 100%; /* Full width for the button */
+    padding: 10px; /* Padding inside the button */
+    background-color: #007bff; /* Primary button color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded edges */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Transition effect for hover */
+}
+
+.btn-submit:hover {
+    background-color: #0056b3; /* Darker shade on hover */
+}
+
+.message-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    z-index: 1000;
+    color: white;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.message-box.success {
+    background-color: #28a745;
+    display: block;
+    opacity: 1;
+}
+
+.message-box.error {
+    background-color: #dc3545;
+    display: block;
+    opacity: 1;
+}
+
+
+/* Link Styles */
+p {
+    text-align: center; /* Center-align the paragraph */
+}
+
+a {
+    color: #007bff; /* Link color */
+    text-decoration: none; /* No underline */
+}
+
+a:hover {
+    text-decoration: underline; /* Underline on hover */
+}

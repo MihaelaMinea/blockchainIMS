@@ -1,0 +1,49 @@
+doctype html
+html
+  head
+    title= title
+    meta(charset="UTF-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet" href="/css/login.css") 
+    script(src="/js/login.js") 
+
+  body
+    .full-height
+      .container
+        h1 #{title}
+        p #{message}
+
+        .intro
+          h2 Please Login
+          p Enter your credentials to access your account.
+
+        form(id="loginForm") 
+          .form-group
+            label(for="email") Email
+            input(type="email", id="email", name="email", required=true)
+
+          .form-group
+            label(for="password") Password
+            input(type="password", id="password", name="password", required=true)
+
+          button(type="submit", class="btn login-btn") Login
+
+          .intro
+            a(href="/auth/register") Not Registered?
+
+        footer
+          p &copy; #{new Date().getFullYear()} BlockchainIMS. All rights reserved.
+
+    script.
+      // Extract query parameters from the URL
+      const urlParams = new URLSearchParams(window.location.search);
+      const email = urlParams.get('email');
+      const password = urlParams.get('password');
+
+      // Pre-fill the email and password fields if available
+      if (email) {
+          document.getElementById('email').value = email;
+      }
+      if (password) {
+          document.getElementById('password').value = password;
+      }

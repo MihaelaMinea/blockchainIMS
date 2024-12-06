@@ -4,11 +4,14 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const couch = new NodeCouchDb({
+    host: process.env.COUCHDB_HOST,
+    port: process.env.COUCHDB_PORT,
     auth: {
         user: process.env.COUCHDB_USER,
         pass: process.env.COUCHDB_PASSWORD,
     },
 });
+
 
 const stateDbName = process.env.COUCHDB_STATE_DB;  // e.g. 'state_ims'
 const ledgerDbName = process.env.COUCHDB_LEDGER_DB; // e.g. 'ledger_ims'

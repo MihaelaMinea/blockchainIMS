@@ -1,49 +1,36 @@
-# // the best until now, DO NOT LOOSE IT
+# do not touch! it is working after 3 days :)
+version: '3'
 services:
+  # Node.js application
+  node:
+    build: .
+    container_name: node-app
+    ports:
+      - "3000:3000"  # Host port 3000 mapped to container port 3000
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: password
+      COUCHDB_HOST: couchdb
+      COUCHDB_PORT: 5984
+      COUCHDB_STATE_DB: state_ims
+      COUCHDB_LEDGER_DB: ledger_ims
+      PORT: 3000
+      HOST: 0.0.0.0
+    depends_on:
+      - couchdb  # This ensures CouchDB starts first
+
+  # CouchDB container
   couchdb:
-    image: couchdb:3.3.1
+    image: couchdb:3.4.2
     container_name: couchdb
     ports:
-      - "5984:5984"
+      - "6984:5984"  # Expose CouchDB on port 6984
     environment:
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=user
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: password
     volumes:
-      - ~/docker/couchdb_data:/opt/couchdb/data
-    networks:
-      - app-network
+      - couchdb_data:/opt/couchdb/data  # Persist data between restarts
 
-  node_app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: node_app
-    ports:
-      - "3000:3000"
-    environment:
-      - API_NAME=api
-      - API_SDK_PASSWORD=user
-      - COUCHDB_USER=admin
-      - COUCHDB_PASSWORD=user
-      - COUCHDB_HOST=couchdb
-      - COUCHDB_PORT=5984
-      - COUCHDB_STATE_DB=state_ims
-      - COUCHDB_LEDGER_DB=ledger_ims
-      - PORT=3000
-    depends_on:
-      - couchdb
-    networks:
-      - app-network
-
+# Volumes to persist CouchDB data
 volumes:
   couchdb_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ~/docker/couchdb_data
-
-networks:
-  app-network:
-    external: true
-    name: blockchainims_app-network

@@ -1,5 +1,5 @@
+
 import express from 'express';
-import dotenv from 'dotenv';
 import morgan from 'morgan';
 import session from 'express-session';
 import logging from './middleware/logging.js';
@@ -12,7 +12,8 @@ import connectDB from './config/db.js';
 import './config/db.js'; // This ensures the db file is executed, including environment variable loading and logging
 import { connectToFabric, disconnectFromFabric } from './utils/fabricConnection.js';
 
-dotenv.config();
+
+
 
 const app = express();
 
@@ -65,8 +66,9 @@ const startServer = async () => {
     try {
         await connectDB(); // Connect to MongoDB or other database
         const PORT = process.env.PORT || 3000;
+        const HOST = process.env.HOST || '0.0.0.0'; // Default fallback to '0.0.0.0'
 
-        app.listen(PORT, () => {
+        app.listen(PORT,HOST, () => {
             console.log(`Server is running on http://localhost:${PORT}`);
         });
     } catch (err) {

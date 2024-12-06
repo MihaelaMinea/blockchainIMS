@@ -1,375 +1,186 @@
-import NodeCouchDb from 'node-couchdb'; // Import the CouchDB client
+// //running well without containers
+// import axios from 'axios'; // Import axios to send HTTP requests
+// import dotenv from 'dotenv';
+// import logger from '../logger.js'; // Adjust path if needed
+
+// dotenv.config();
+
+
+// // Log the environment variables to verify they are loaded
+// logger.info(`CouchDB Host: ${process.env.COUCHDB_HOST}`);
+// logger.info(`CouchDB User: ${process.env.COUCHDB_USER}`);
+// logger.info(`CouchDB Password: ${process.env.COUCHDB_PASSWORD}`);
+// logger.info(`CouchDB Port: ${process.env.COUCHDB_PORT}`);
+
+// // Set up CouchDB connection details
+// const couchDbUrl = `http://${process.env.COUCHDB_USER}:${process.env.COUCHDB_PASSWORD}@${process.env.COUCHDB_HOST}:${process.env.COUCHDB_PORT}`;
+
+// // Function to check if a database exists
+// const databaseExists = async (dbName) => {
+//     logger.info(`Checking existence of database: ${dbName}`);
+//     try {
+//         // Perform an HTTP HEAD request to check if the database exists
+//         const response = await axios.head(`${couchDbUrl}/${dbName}`);
+//         if (response.status === 200) {
+//             logger.info(`Database ${dbName} exists.`);
+//             return true; // Database exists
+//         }
+//     } catch (error) {
+//         if (error.response && error.response.status === 404) {
+//             logger.warn(`Database ${dbName} does not exist.`);
+//             return false; // Database doesn't exist
+//         }
+//         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
+//         throw error; // Rethrow other errors
+//     }
+// };
+
+// // Function to create a database if it doesn't exist
+// const createDatabaseIfNeeded = async (dbName) => {
+//     const exists = await databaseExists(dbName);
+    
+//     if (!exists) {
+//         try {
+//             // Create the database if it doesn't exist (non-partitioned by default)
+//             const response = await axios.put(`${couchDbUrl}/${dbName}`);
+//             if (response.status === 201) {
+//                 logger.info(`Database ${dbName} created successfully.`);
+//             }
+//         } catch (error) {
+//             logger.error(`Failed to create database ${dbName}: ${error.message}`);
+//             throw error; // Handle error or fail gracefully
+//         }
+//     } else {
+//         logger.info(`Database ${dbName} already exists.`);
+//     }
+// };
+
+// // Function to connect to CouchDB and verify that required databases exist
+// const connectDB = async () => {
+//     try {
+//         // Ensure that the required databases (state_ims and ledger_ims) exist
+//         await createDatabaseIfNeeded(process.env.COUCHDB_STATE_DB); // state_ims
+//         await createDatabaseIfNeeded(process.env.COUCHDB_LEDGER_DB); // ledger_ims
+
+//         logger.info('Both databases verified and created successfully.');
+//         return true; // Return true indicating that the connection is successful
+//     } catch (error) {
+//         logger.error('Error connecting to CouchDB: ' + error.message);
+//         process.exit(1); // Exit the process if connection fails
+//     }
+// };
+
+// // Export the connectDB function so it can be used elsewhere in your app
+// export default connectDB;
+
+import axios from 'axios'; // Import axios to send HTTP requests
 import dotenv from 'dotenv';
-import logger from '../logger.js'; // Adjust path as needed
+import logger from '../logger.js'; // Adjust path if needed
 
 dotenv.config();
 
-// Initialize CouchDB
-const couch = new NodeCouchDb({
-    auth: {
-        user: process.env.COUCHDB_USER,
-        pass: process.env.COUCHDB_PASSWORD,
-    },
-});
+// Log the environment variables to verify they are loaded
+logger.info(`CouchDB Host: ${process.env.COUCHDB_HOST}`);
+logger.info(`CouchDB User: ${process.env.COUCHDB_USER}`);
+logger.info(`CouchDB Password: ${process.env.COUCHDB_PASSWORD}`);
+logger.info(`CouchDB Port: ${process.env.COUCHDB_PORT}`);
+
+// Set up CouchDB connection details
+const couchDbUrl = `http://${process.env.COUCHDB_USER}:${process.env.COUCHDB_PASSWORD}@${process.env.COUCHDB_HOST}:${process.env.COUCHDB_PORT}`;
 
 // Function to check if a database exists
 const databaseExists = async (dbName) => {
     logger.info(`Checking existence of database: ${dbName}`);
     try {
-        // Attempt to fetch the database
-        const response = await couch.get(dbName, '');
-        logger.info(`Database ${dbName} exists.`);
-        return true; // Database exists
+        const response = await axios.head(`${couchDbUrl}/${dbName}`);
+        if (response.status === 200) {
+            logger.info(`Database ${dbName} exists.`);
+            return true;
+        }
     } catch (error) {
-        if (error.statusCode === 404) {
+        if (error.response?.status === 404) {
             logger.warn(`Database ${dbName} does not exist.`);
-            return false; // Database does not exist
+            return false;
         }
         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
-        throw error; // Rethrow other errors
+        throw error;
     }
 };
 
-// Function to connect to the database and verify that required databases exist
+// Function to create a database if it doesn't exist
+const createDatabaseIfNeeded = async (dbName) => {
+    const exists = await databaseExists(dbName);
+    if (!exists) {
+        try {
+            const response = await axios.put(`${couchDbUrl}/${dbName}`);
+            if (response.status === 201) {
+                logger.info(`Database ${dbName} created successfully.`);
+            }
+        } catch (error) {
+            logger.error(`Failed to create database ${dbName}: ${error.message}`);
+            throw error;
+        }
+    } else {
+        logger.info(`Database ${dbName} already exists.`);
+    }
+};
+
+// Function to create the _users database if it doesn't exist
+const createUsersDatabase = async () => {
+    try {
+        const response = await axios.put(`${couchDbUrl}/_users`);
+        if (response.status === 201) {
+            logger.info('Database _users created successfully.');
+        }
+    } catch (error) {
+        if (error.response?.status === 412) {
+            logger.info('_users database already exists.');
+        } else {
+            logger.error('Error creating _users database:', error.message);
+        }
+    }
+};
+
+// Function to create a user document if it doesn't exist
+const createUserIfNotExists = async (username, password) => {
+    const userId = `org.couchdb.user:${username}`;
+    const userDoc = {
+        _id: userId,
+        name: username,
+        roles: [],
+        type: 'user',
+        password,
+    };
+
+    try {
+        await axios.put(`${couchDbUrl}/_users/${userId}`, userDoc);
+        logger.info(`User ${username} created successfully.`);
+    } catch (error) {
+        if (error.response?.status === 409) {
+            logger.info(`User ${username} already exists.`);
+        } else {
+            logger.error(`Failed to create user ${username}: ${error.message}`);
+            throw error;
+        }
+    }
+};
+
+// Function to connect to CouchDB and ensure databases and users are created
 const connectDB = async () => {
     try {
-        const stateDbExists = await databaseExists(process.env.COUCHDB_STATE_DB);
-        const ledgerDbExists = await databaseExists(process.env.COUCHDB_LEDGER_DB);
+        await createUsersDatabase(); // Create the _users database if needed
+        await createDatabaseIfNeeded(process.env.COUCHDB_STATE_DB); // state_ims
+        await createDatabaseIfNeeded(process.env.COUCHDB_LEDGER_DB); // ledger_ims
 
-        if (!stateDbExists || !ledgerDbExists) {
-            logger.error('One or more required databases do not exist. Exiting.');
-            process.exit(1); // Exit if any database does not exist
-        }
+        // Example: Ensure a default admin user exists
+        await createUserIfNotExists(process.env.DEFAULT_ADMIN_USER, process.env.DEFAULT_ADMIN_PASSWORD);
 
-        logger.info('Both databases verified successfully.');
-        return couch; // Return the CouchDB instance for further use
+        logger.info('CouchDB setup complete. Databases and default users verified.');
+        return true;
     } catch (error) {
-        logger.error('Error connecting to CouchDB: ' + error.message);
-        process.exit(1); // Exit the process if connection fails
+        logger.error('Error connecting to CouchDB:', error.message);
+        process.exit(1); // Exit process if connection fails
     }
 };
 
-// Export the function and CouchDB instance
 export default connectDB;
-export { couch as ledgerDB }; // Exporting ledgerDB if needed
-
-
-
-
-
-
-
-
-// working but cannot fetch data from db ECONNREFUSED 127.0.0.1:5984
-// import NodeCouchDb from 'node-couchdb'; // Import the CouchDB client
-// import dotenv from 'dotenv';
-// import logger from '../logger.js'; // Adjust path as needed
-
-// dotenv.config();
-
-// // Initialize CouchDB
-// const couch = new NodeCouchDb({
-//     auth: {
-//         user: process.env.COUCHDB_USER,
-//         pass: process.env.COUCHDB_PASSWORD,
-//     },
-//     host: process.env.COUCHDB_HOST || 'couchdb', // Default to 'couchdb' if not set
-//     protocol: 'http', // Ensure the correct protocol (http or https)
-//     port: process.env.COUCHDB_PORT || 5984, // Use the port from the environment or default to 5984
-// });
-
-// // Function to check if a database exists
-// const databaseExists = async (dbName) => {
-//     logger.info(`Checking existence of database: ${dbName}`);
-//     try {
-//         // Attempt to fetch the database
-//         const response = await couch.get(dbName, '');
-//         logger.info(`Database ${dbName} exists.`);
-//         return true; // Database exists
-//     } catch (error) {
-//         if (error.statusCode === 404) {
-//             logger.warn(`Database ${dbName} does not exist.`);
-//             return false; // Database does not exist
-//         }
-//         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
-//         throw error; // Rethrow other errors
-//     }
-// };
-
-// // Function to connect to the database and verify that required databases exist
-// const connectDB = async () => {
-//     try {
-//         const stateDbExists = await databaseExists(process.env.COUCHDB_STATE_DB);
-//         const ledgerDbExists = await databaseExists(process.env.COUCHDB_LEDGER_DB);
-
-//         if (!stateDbExists || !ledgerDbExists) {
-//             logger.error('One or more required databases do not exist. Exiting.');
-//             process.exit(1); // Exit if any database does not exist
-//         }
-
-//         logger.info('Both databases verified successfully.');
-//         return couch; // Return the CouchDB instance for further use
-//     } catch (error) {
-//         logger.error('Error connecting to CouchDB: ' + error.message);
-//         process.exit(1); // Exit the process if connection fails
-//     }
-// };
-
-// // Export the function and CouchDB instance
-// export default connectDB;
-// export { couch as ledgerDB }; // Exporting ledgerDB if needed
-
-
-// import NodeCouchDb from 'node-couchdb';
-// import dotenv from 'dotenv';
-// import logger from '../logger.js'; // Adjust path as needed
-
-// // Load environment variables
-// dotenv.config();
-
-// // Log the CouchDB host to ensure the environment variable is loaded correctly
-// logger.info('CouchDB Host:', process.env.COUCHDB_HOST);
-
-// // Ensure the environment variables are available
-// const COUCHDB_HOST = process.env.COUCHDB_HOST;
-// const COUCHDB_PORT = process.env.COUCHDB_PORT || 5984; // Default to 5984 if not set
-
-// // Check if required environment variables are set
-// if (!COUCHDB_HOST || !process.env.COUCHDB_USER || !process.env.COUCHDB_PASSWORD) {
-//     logger.error('Missing required CouchDB environment variables (COUCHDB_HOST, COUCHDB_USER, COUCHDB_PASSWORD). Exiting.');
-//     process.exit(1); // Exit if required variables are missing
-// }
-
-// // Create the CouchDB URL
-// const COUCHDB_URL = `http://${COUCHDB_HOST}:${COUCHDB_PORT}`;
-// logger.info(`Connecting to CouchDB at: ${COUCHDB_URL}`);
-
-// // Initialize CouchDB
-// const couch = new NodeCouchDb({
-    
-//     auth: {
-//         user: process.env.COUCHDB_USER,
-//         pass: process.env.COUCHDB_PASSWORD,
-//     },
-//     host: COUCHDB_HOST, // Use environment variable directly here
-//     protocol: 'http',
-//     port: COUCHDB_PORT,
-//     url: COUCHDB_URL, // Use the full URL for connection
-// });
-
-// // Function to check if a database exists
-// const databaseExists = async (dbName) => {
-//     logger.info(`Checking existence of database: ${dbName}`);
-//     try {
-//         // Attempt to fetch the database
-//         const response = await couch.get(dbName, '');
-//         logger.info(`Database ${dbName} exists.`);
-//         return true; // Database exists
-//     } catch (error) {
-//         if (error.statusCode === 404) {
-//             logger.warn(`Database ${dbName} does not exist.`);
-//             return false; // Database does not exist
-//         }
-//         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
-//         throw error; // Rethrow other errors
-//     }
-// };
-
-// // Function to connect to the database and verify that required databases exist
-// const connectDB = async () => {
-//     try {
-//         const stateDbExists = await databaseExists(process.env.COUCHDB_STATE_DB);
-//         const ledgerDbExists = await databaseExists(process.env.COUCHDB_LEDGER_DB);
-
-//         if (!stateDbExists || !ledgerDbExists) {
-//             logger.error('One or more required databases do not exist. Exiting.');
-//             process.exit(1); // Exit if any database does not exist
-//         }
-
-//         logger.info('Both databases verified successfully.');
-//         return couch; // Return the CouchDB instance for further use
-//     } catch (error) {
-//         logger.error('Error connecting to CouchDB: ' + error.message);
-//         process.exit(1); // Exit the process if connection fails
-//     }
-// };
-
-// // Export the function and CouchDB instance
-// export default connectDB;
-// export { couch as ledgerDB }; // Exporting ledgerDB if needed
-
-
-// import NodeCouchDb from 'node-couchdb';
-// import dotenv from 'dotenv';
-// import logger from '../logger.js'; // Adjust path as needed
-
-// // Load environment variables as the very first thing in the code
-// dotenv.config();
-
-// // Ensure that the environment variables are loaded and log them
-// const COUCHDB_HOST = process.env.COUCHDB_HOST;
-// const COUCHDB_USER = process.env.COUCHDB_USER;
-// const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD;
-// const COUCHDB_PORT = process.env.COUCHDB_PORT || 5984; // Default to 5984 if not set
-// const COUCHDB_STATE_DB = process.env.COUCHDB_STATE_DB;
-// const COUCHDB_LEDGER_DB = process.env.COUCHDB_LEDGER_DB;
-
-// // Log environment variables to confirm they are loaded properly
-// logger.info('Environment variables loaded:');
-// logger.info(`COUCHDB_HOST: ${COUCHDB_HOST}`);
-// logger.info(`COUCHDB_USER: ${COUCHDB_USER}`);
-// logger.info(`COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}`);
-// logger.info(`COUCHDB_PORT: ${COUCHDB_PORT}`);
-// logger.info(`COUCHDB_STATE_DB: ${COUCHDB_STATE_DB}`);
-// logger.info(`COUCHDB_LEDGER_DB: ${COUCHDB_LEDGER_DB}`);
-
-// // Check if required environment variables are set
-// if (!COUCHDB_HOST || !COUCHDB_USER || !COUCHDB_PASSWORD || !COUCHDB_STATE_DB || !COUCHDB_LEDGER_DB) {
-//     logger.error('Missing required CouchDB environment variables. Exiting.');
-//     console.error('Missing required CouchDB environment variables.');
-//     process.exit(1); // Exit if required variables are missing
-// }
-
-// // Create the CouchDB URL
-// const COUCHDB_URL = `http://${COUCHDB_HOST}:${COUCHDB_PORT}`;
-// logger.info(`Connecting to CouchDB at: ${COUCHDB_URL}`);
-
-// // Initialize CouchDB
-// const couch = new NodeCouchDb({
-//     auth: {
-//         user: COUCHDB_USER,
-//         pass: COUCHDB_PASSWORD,
-//     },
-//     host: COUCHDB_HOST, // Use environment variable directly here
-//     protocol: 'http',
-//     port: COUCHDB_PORT,
-//     url: COUCHDB_URL, // Use the full URL for connection
-// });
-
-// // Function to check if a database exists
-// const databaseExists = async (dbName) => {
-//     logger.info(`Checking existence of database: ${dbName}`);
-//     try {
-//         // Attempt to fetch the database
-//         const response = await couch.get(dbName, '');
-//         logger.info(`Database ${dbName} exists.`);
-//         return true; // Database exists
-//     } catch (error) {
-//         if (error.statusCode === 404) {
-//             logger.warn(`Database ${dbName} does not exist.`);
-//             return false; // Database does not exist
-//         }
-//         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
-//         throw error; // Rethrow other errors
-//     }
-// };
-
-// // Function to connect to the database and verify that required databases exist
-// const connectDB = async () => {
-//     try {
-//         const stateDbExists = await databaseExists(COUCHDB_STATE_DB);
-//         const ledgerDbExists = await databaseExists(COUCHDB_LEDGER_DB);
-
-//         if (!stateDbExists || !ledgerDbExists) {
-//             logger.error('One or more required databases do not exist. Exiting.');
-//             process.exit(1); // Exit if any database does not exist
-//         }
-
-//         logger.info('Both databases verified successfully.');
-//         return couch; // Return the CouchDB instance for further use
-//     } catch (error) {
-//         logger.error('Error connecting to CouchDB: ' + error.message);
-//         process.exit(1); // Exit the process if connection fails
-//     }
-// };
-
-// // Export the function and CouchDB instance
-// export default connectDB;
-// export { couch as ledgerDB }; // Exporting ledgerDB if needed
-
-// import NodeCouchDb from 'node-couchdb';
-// import dotenv from 'dotenv';
-// import logger from '../logger.js';
-// import { promisify } from 'util';
-// import delay from 'delay'; // You can use the 'delay' package for retries
-
-// dotenv.config();
-
-// const COUCHDB_HOST = process.env.COUCHDB_HOST;
-// const COUCHDB_USER = process.env.COUCHDB_USER;
-// const COUCHDB_PASSWORD = process.env.COUCHDB_PASSWORD;
-// const COUCHDB_PORT = process.env.COUCHDB_PORT || 5984;
-// const COUCHDB_STATE_DB = process.env.COUCHDB_STATE_DB;
-// const COUCHDB_LEDGER_DB = process.env.COUCHDB_LEDGER_DB;
-
-// logger.info('Environment variables loaded:');
-// logger.info(`COUCHDB_HOST: ${COUCHDB_HOST}`);
-// logger.info(`COUCHDB_USER: ${COUCHDB_USER}`);
-// logger.info(`COUCHDB_PASSWORD: ${COUCHDB_PASSWORD}`);
-// logger.info(`COUCHDB_PORT: ${COUCHDB_PORT}`);
-// logger.info(`COUCHDB_STATE_DB: ${COUCHDB_STATE_DB}`);
-// logger.info(`COUCHDB_LEDGER_DB: ${COUCHDB_LEDGER_DB}`);
-
-// if (!COUCHDB_HOST || !COUCHDB_USER || !COUCHDB_PASSWORD || !COUCHDB_STATE_DB || !COUCHDB_LEDGER_DB) {
-//     logger.error('Missing required CouchDB environment variables. Exiting.');
-//     process.exit(1);
-// }
-
-// const COUCHDB_URL = `http://${COUCHDB_HOST}:${COUCHDB_PORT}`;
-// logger.info(`Connecting to CouchDB at: ${COUCHDB_URL}`);
-
-// const couch = new NodeCouchDb({
-//     auth: {
-//         user: COUCHDB_USER,
-//         pass: COUCHDB_PASSWORD,
-//     },
-//     host: COUCHDB_HOST,
-//     protocol: 'http',
-//     port: COUCHDB_PORT,
-//     url: COUCHDB_URL,
-// });
-
-// const databaseExists = async (dbName) => {
-//     logger.info(`Checking existence of database: ${dbName}`);
-//     try {
-//         const response = await couch.get(dbName, '');
-//         logger.info(`Database ${dbName} exists.`);
-//         return true;
-//     } catch (error) {
-//         if (error.statusCode === 404) {
-//             logger.warn(`Database ${dbName} does not exist.`);
-//             return false;
-//         }
-//         logger.error(`Error checking existence of database ${dbName}: ${error.message}`);
-//         throw error;
-//     }
-// };
-
-// const retryConnectDB = async (maxRetries = 5, retryDelay = 5000) => {
-//     let attempts = 0;
-//     while (attempts < maxRetries) {
-//         try {
-//             const stateDbExists = await databaseExists(COUCHDB_STATE_DB);
-//             const ledgerDbExists = await databaseExists(COUCHDB_LEDGER_DB);
-
-//             if (stateDbExists && ledgerDbExists) {
-//                 logger.info('Both databases verified successfully.');
-//                 return couch;
-//             }
-//             throw new Error('Required databases not found.');
-//         } catch (error) {
-//             attempts++;
-//             logger.error(`Attempt ${attempts} failed: ${error.message}`);
-//             if (attempts < maxRetries) {
-//                 logger.info(`Retrying in ${retryDelay / 1000} seconds...`);
-//                 await delay(retryDelay);
-//             } else {
-//                 logger.error('Max retries reached, exiting.');
-//                 process.exit(1);
-//             }
-//         }
-//     }
-// };
-
-// export default retryConnectDB;
-// export { couch as ledgerDB };

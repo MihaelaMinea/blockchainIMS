@@ -1,0 +1,110 @@
+
+html
+  head
+    title QR Codes for Items
+    style.
+      /* Simple modal styles */
+      .modal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 1; /* Sit on top */
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgba(0,0,0,0.4); /* Black with opacity */
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%; /* Can be adjusted */
+        max-height: 80%;
+        overflow-y: auto; /* Enable scrolling for large content */
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+  body
+    h1 QR Codes for Items
+    table
+      thead
+        tr
+          th Item ID
+          th Item Description
+          th Item Price
+          th Item Name
+          th QR Code
+          th Action
+      tbody
+        each qr in qrCodes
+          tr
+            td= qr.itemId
+            td= qr.itemDescription
+            td= qr.itemPrice
+            td= qr.itemName
+            td
+              img(src=qr.qrCodeBase64, alt='QR Code for ' + qr.itemName)
+            td
+              button(class="btn-view-history" data-item-id=qr.itemId) View History
+
+    // Modal for displaying the item history
+    div(id="historyModal", class="modal")
+      div(class="modal-content")
+        span(class="close") &times;
+        pre(id="historyContent") <!-- Preformatted text block for JSON -->
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        // Select all 'View History' buttons
+        const historyButtons = document.querySelectorAll('.btn-view-history');
+        const modal = document.getElementById('historyModal');
+        const modalContent = document.getElementById('historyContent');
+        const closeBtn = document.querySelector('.close');
+        
+        // Add click event listeners to each button
+        historyButtons.forEach(button => {
+          button.addEventListener('click', async function() {
+            const itemId = this.getAttribute('data-item-id'); // Get the item ID from the button
+
+            try {
+              // Fetch the history from the server
+              const response = await fetch(`/api/mobile/items/${itemId}/history`);
+              const data = await response.json();
+
+              // Display the history in the modal
+              modalContent.textContent = JSON.stringify(data.history, null, 2); // Format JSON for readability
+              modal.style.display = 'block'; // Show the modal
+            } catch (error) {
+              console.error('Error fetching history:', error);
+              alert('Error fetching history');
+            }
+          });
+        });
+
+        // When the user clicks the close button, close the modal
+        closeBtn.addEventListener('click', function() {
+          modal.style.display = 'none'; // Hide the modal
+        });
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener('click', function(event) {
+          if (event.target === modal) {
+            modal.style.display = 'none'; // Hide the modal if clicked outside
+          }
+        });
+      });

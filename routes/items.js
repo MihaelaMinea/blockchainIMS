@@ -9,8 +9,18 @@ router.get('/new', (req, res) => {
     res.render('newItemForm', { title: 'BlockchainIMS app', message: 'Inventory Form' });
 });
 
-// Route to render the dashboard with items and their index
+// Render the form for updating an item
+router.get('/update', async (req, res) => {
+    try {
+        const items = await Item.getItems();
+        res.render('updateItemForm', { title: 'Update Item', message: 'Update Form', items });
+    } catch (err) {
+        console.error('Error fetching items:', err);
+        res.status(500).send('Server Error');
+    }
+});
 
+// Route to render the dashboard with items and their index
 router.get('/', async (req, res) => {
     
     try {
@@ -19,6 +29,19 @@ router.get('/', async (req, res) => {
         res.render('items', { items });
     } catch (err) {
         console.error('Error fetching items:', err);
+        res.status(500).send('Server Error');
+    }
+});
+
+//  Route to fetch item data for populating the form
+// Fetch item data by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const item = await Item.getItemById(req.params.id);
+        if (!item) return res.status(404).send('Item not found');
+        res.json(item);
+    } catch (err) {
+        console.error('Error fetching item:', err);
         res.status(500).send('Server Error');
     }
 });
@@ -56,6 +79,44 @@ router.post('/', async (req, res) => {
         res.redirect('/api/items'); // Redirect to dashboard after saving
     } catch (err) {
         res.status(500).send('Error saving item to the database');
+    }
+});
+
+// Update an existing item
+router.post('/update', async (req, res) => {
+    const { itemId, name, description, supplier, price, quantity, category, dateReceived } = req.body;
+
+    if (!itemId) {
+        return res.status(400).send('Item ID is required');
+    }
+
+    const updatedItem = {
+        name,
+        description,
+        supplier,
+        price: Number(price),
+        quantity: Number(quantity),
+        category,
+        dateReceived,
+    };
+
+    try {
+        await Item.updateItem(itemId, updatedItem);
+        res.redirect('/api/items'); // Redirect to dashboard after update
+    } catch (err) {
+        console.error('Error updating item:', err);
+        res.status(500).send('Error updating item in the database');
+    }
+});
+
+// Route to delete an item
+router.post('/delete/:id', async (req, res) => {
+    try {
+        await Item.deleteItem(req.params.id);
+        res.redirect('/api/items'); // Redirect to dashboard after deletion
+    } catch (err) {
+        console.error('Error deleting item:', err);
+        res.status(500).send('Error deleting item from the database');
     }
 });
 

@@ -1,3 +1,67 @@
+//- doctype html
+//- html
+//-   head
+//-     title= title
+//-     meta(charset="UTF-8")
+//-     meta(name="viewport" content="width=device-width, initial-scale=1.0")
+//-     link(rel="stylesheet" href="/css/home.css")     
+//-     script(src="/js/home.js")                        
+
+//-   body
+//-     .full-height
+//-       .container
+//-         h1 #{title}
+//-         p #{message}
+
+//-         // Introduction Section
+//-         .intro
+//-           h2 Welcome to BlockchainIMS
+//-           p BlockchainIMS is an advanced inventory management system that leverages 
+//-           p blockchain technology to ensure security, transparency, and efficiency in 
+//-           p managing your inventory.
+
+//-         // Navigation Buttons
+//-         .button-container
+//-           a(href="/api/items" class="btn dashboard-btn") View Dashboard
+//-           a(href="/api/items/new" class="btn add-item-btn") Add New Item
+//-            a(href="/api/items/update" class="btn add-item-btn") Update Existing Item
+//-           button(class="btn track-item-btn" id="trackItemsBtn") Track Items
+
+//-         // Key Features Section
+//-         .features
+//-           h2 Key Features
+//-           ul
+//-             li Feature 1: Advanced security measures using blockchain technology
+//-             li Feature 2: Real-time inventory tracking
+//-             li Feature 3: Transparent transaction records
+//-             li Feature 4: User-friendly interface
+//-             li Feature 5: Comprehensive analytics and reporting tools for better decision-making
+
+//-         // Track Items Modal
+//-         .modal#trackItemsModal(style="display: none;")
+//-           .modal-content
+//-             span.close(&times; onclick="closeTrackItemsModal()")
+//-             h2 Select an Item to Track
+//-             ul#itemList
+//-               // Items will be dynamically populated here
+//-             footer
+//-               button(class="btn" onclick="closeTrackItemsModal()") Close
+
+//-         // Modification History Modal
+//-         .modal#historyModal(style="display: none;")
+//-           .modal-content
+//-             span.close(&times; onclick="closeHistoryModal()")
+//-             h2 Modification History for <span id="historyItemName"></span>
+//-             ul#historyList
+//-               // Modifications will be dynamically populated here
+//-             footer
+//-               button(class="btn" onclick="closeHistoryModal()") Close
+
+//-         // Footer
+//-         footer
+//-           p &copy; #{new Date().getFullYear()} BlockchainIMS. All rights reserved.
+
+
 doctype html
 html
   head
@@ -22,8 +86,14 @@ html
 
         // Navigation Buttons
         .button-container
-          a(href="/api/items" class="btn dashboard-btn") View Dashboard
-          a(href="/api/items/new" class="btn add-item-btn") Add New Item
+          .row
+            a(href="/api/items" class="btn dashboard-btn") View Dashboard
+            a(href="/api/items/new" class="btn add-item-btn") Add New Item
+            a(href="/api/items/update" class="btn add-item-btn") Update Existing Item
+
+        // New Row for MobileQR and Track Items
+        .row
+          a(href="/api/mobile/qrcodes" class="btn mobile-qr-btn") Mobile QR Codes
           button(class="btn track-item-btn" id="trackItemsBtn") Track Items
 
         // Key Features Section

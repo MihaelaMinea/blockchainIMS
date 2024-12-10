@@ -1,0 +1,61 @@
+doctype html
+html
+  head
+    title Item History
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="/css/items.css")
+
+  body
+    .container
+      h1 History of Item: #{itemId}
+
+      if history.updates.length
+        table
+          thead
+            tr
+              th Date
+              th Action
+              th Name
+              th Description
+              th Supplier
+              th Price
+              th Quantity
+              th Category
+          tbody
+            each update in history.updates
+              tr
+                td= new Date(update.timestamp).toLocaleDateString()  // Format the timestamp to a readable date
+                td= 'Update'
+                td= update.changes.name
+                td= update.changes.description
+                td= update.changes.supplier
+                td= (typeof update.changes.price === 'number' ? `$${update.changes.price.toFixed(2)}` : 'N/A')
+                td= update.changes.quantity
+                td= update.changes.category
+      else
+        p No updates found for this item.
+
+      // Display the initial state of the item (create action)
+      h2 Initial State
+      table
+        thead
+          tr
+            th Name
+            th Description
+            th Supplier
+            th Price
+            th Quantity
+            th Category
+            th Date Received
+        tbody
+          tr
+            td= history.name
+            td= history.description
+            td= history.supplier
+            td= (typeof history.price === 'number' ? `$${history.price.toFixed(2)}` : 'N/A')
+            td= history.quantity
+            td= history.category
+            td= new Date(history.dateReceived).toLocaleDateString()
+
+      a(href="/api/items" class="btn") Back to Items

@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "prestart": "npm install",
     "start": "nodemon index.js",
     "prod": "node index.js"
   },
@@ -26,7 +27,8 @@
     "node-couchdb": "^2.0.0",
     "node-fetch": "^3.3.2",
     "nodemon": "^3.1.7",
-    "pug": "^3.0.3"
+    "pug": "^3.0.3",
+    "qrcode": "^1.5.4"
   },
   "devDependencies": {
     "jshint": "^2.13.6"

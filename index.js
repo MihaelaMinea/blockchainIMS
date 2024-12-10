@@ -6,6 +6,7 @@ import logging from './middleware/logging.js';
 import items from './routes/items.js';
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
+import mobileApi from './api/mobileApi.js'; // Import the mobile API routes
 import logger from './logger.js';
 import connectDB from './config/db.js';
 // Import the full db.js file to ensure everything is loaded (including environment variables)
@@ -34,6 +35,9 @@ app.use(session({
 app.get('/', (req, res) => {
     res.redirect('/auth/login');
 });
+
+// Mobile API route
+app.use('/api/mobile', mobileApi); // Mount the mobile API router at /api/mobile
 
 // Fabric Network Connection Route
 app.get('/fabric/connect', async (req, res) => {

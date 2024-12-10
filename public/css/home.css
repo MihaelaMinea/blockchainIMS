@@ -47,26 +47,64 @@
 /* Button container styling */
 .button-container {
     display: flex;
-    justify-content: center;
-    gap: 15px; /* Space between buttons */
+    flex-wrap: wrap; /* Allow buttons to wrap to the next line if needed */
+    justify-content: flex-start; /* Align buttons to the left */
     margin-bottom: 20px; /* Add margin to separate buttons from the intro section */
 }
 
 /* Button styling */
 .btn {
     padding: 12px 24px; /* Increased padding for better click area */
-    background-color: #007bff; /* Primary button color */
+    background-color: #007bff; /* Default primary color */
     color: white;
     text-decoration: none;
     border-radius: 5px;
     border: none; /* Remove default border */
-    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform for effect */
     font-weight: bold; /* Bold text */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform for effect */
+    font-family: Arial, sans-serif; /* Ensure consistent font */
+    margin: 5px; /* Add margin to ensure spacing between buttons */
+    font-size: 16px; /* Ensure consistent font size */
 }
 
+/* Default hover effect for buttons */
 .btn:hover {
-    background-color: #0056b3; /* Darker color on hover */
     transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Specific hover for different buttons to retain their individual base color */
+
+/* View Dashboard button */
+.dashboard-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Add New Item button */
+.add-item-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Update Existing Item button */
+.update-item-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Track Item button */
+.track-item-btn {
+    background-color: #007bff; /* Same blue as other buttons */
+}
+
+.track-item-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Mobile QR Codes button */
+.mobile-qr-btn {
+    background-color: #4CAF50; /* Green color for the Mobile QR button */
+}
+
+.mobile-qr-btn:hover {
+    background-color: #45a049; /* Darker green when hovered */
 }
 
 /* Key Features section */
@@ -177,5 +215,10 @@ footer {
 
     .modal-content {
         width: 90%; /* Wider modal on small screens */
+    }
+
+    /* For mobile view, make sure buttons wrap and maintain margins */
+    .button-container {
+        justify-content: flex-start; /* Align buttons to the left */
     }
 }

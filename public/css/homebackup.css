@@ -1,0 +1,219 @@
+/* Reset some default styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+/* Full height container */
+.full-height {
+    min-height: 100vh; /* Ensures the container takes the full height of the viewport */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Space between elements */
+    background-color: #f4f4f4; /* Light background color */
+    font-family: Arial, sans-serif; /* Modern font */
+    color: #333; /* Darker text color for contrast */
+}
+
+/* Main container */
+.container {
+    max-width: 1000px; /* Increased max width for a wider layout */
+    margin: 20px auto; /* Center the container and add top margin */
+    padding: 20px; /* Padding for spacing */
+    background-color: white; /* Background color for the main content */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    border-radius: 8px; /* Rounded corners */
+}
+
+/* Intro section styling */
+.intro {
+    text-align: center;
+    margin: 40px 0; /* Add top and bottom margin for spacing */
+}
+
+.intro h2 {
+    font-size: 2.5rem; /* Increase heading size */
+    color: #007bff; /* Primary color */
+    margin-bottom: 15px; /* Add space below the heading */
+}
+
+.intro p {
+    font-size: 1.1rem; /* Slightly larger font for the intro */
+    line-height: 1.5; /* Improved line height */
+    margin: 0 20px; /* Side margin for better readability */
+}
+
+/* Button container styling */
+.button-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow buttons to wrap to the next line if needed */
+    justify-content: flex-start; /* Align buttons to the left */
+    gap: 15px; /* Space between buttons */
+    margin-bottom: 20px; /* Add margin to separate buttons from the intro section */
+}
+
+/* Button styling */
+.btn {
+    padding: 12px 24px; /* Increased padding for better click area */
+    background-color: #007bff; /* Default primary color */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    border: none; /* Remove default border */
+    transition: background-color 0.3s ease, transform 0.3s ease; /* Added transform for effect */
+    font-weight: bold; /* Bold text */
+}
+
+/* Default hover effect for buttons */
+.btn:hover {
+    transform: translateY(-2px); /* Slight lift effect */
+}
+
+/* Specific hover for different buttons to retain their individual base color */
+
+/* View Dashboard button */
+.dashboard-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Add New Item button */
+.add-item-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Update Existing Item button */
+.update-item-btn:hover {
+    background-color: #0056b3; /* Darker blue for hover */
+}
+
+/* Track Item button */
+.track-item-btn:hover {
+    background-color: #e53e3e; /* Darker red for hover */
+}
+
+/* Mobile QR Codes button */
+.mobile-qr-btn {
+    background-color: #4CAF50; /* Green color for the Mobile QR button */
+}
+
+.mobile-qr-btn:hover {
+    background-color: #45a049; /* Darker green when hovered */
+}
+
+/* Key Features section */
+.features {
+    margin: 40px 0; /* Increased margin for better separation */
+    text-align: left; /* Left align for better readability */
+}
+
+.features h2 {
+    text-align: center;
+    margin-bottom: 20px; /* Add space below the heading */
+    font-size: 2rem; /* Increased heading size */
+}
+
+/* Key Features List */
+.features ul {
+    list-style: none; /* Remove bullet points */
+    padding: 0;
+}
+
+.features li {
+    margin: 10px 0; /* Space between items */
+    padding-left: 1.2em; /* Space on the left */
+    position: relative; /* For pseudo-elements */
+    line-height: 1.5; /* Improved line height for readability */
+}
+
+.features li::before {
+    content: '✓'; /* Checkmark */
+    position: absolute; /* Position checkmark */
+    left: 0; /* Align to left */
+    color: #007bff; /* Color for checkmark */
+}
+
+/* Modal Styling */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 10% auto; /* 10% from the top and centered */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Could be more or less, depending on screen size */
+    border-radius: 8px; /* Rounded corners for modal */
+}
+
+span.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+span.close:hover,
+span.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* List Styles for Modals */
+ul {
+    list-style-type: none; /* Remove bullets */
+    padding: 0; /* Remove padding */
+}
+
+ul li {
+    padding: 8px; /* Padding for list items */
+    cursor: pointer; /* Pointer on hover */
+}
+
+ul li:hover {
+    background-color: #f0f0f0; /* Highlight on hover */
+}
+
+/* Footer styling */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    font-size: 0.9em; /* Slightly larger font for footer */
+    color: #666; /* Darker gray */
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .btn {
+        width: 100%; /* Full width buttons on small screens */
+        padding: 15px; /* Increased padding */
+    }
+
+    .intro h2 {
+        font-size: 2rem; /* Adjust heading size */
+    }
+
+    .intro p {
+        font-size: 1rem; /* Adjust paragraph size */
+    }
+
+    .modal-content {
+        width: 90%; /* Wider modal on small screens */
+    }
+
+    /* For mobile view, make sure buttons wrap */
+    .button-container {
+        justify-content: flex-start; /* Align buttons to the left */
+        gap: 10px; /* Maintain spacing between buttons */
+    }
+}

@@ -8,13 +8,50 @@
   
   /* Container Styling */
   .container {
-    max-width: 900px; /* Increased width for better layout */
+    max-width: 100%; /* Increased width for better layout */
     margin: 20px auto;
-    padding: 20px;
+    padding: 0 20px;
     border-radius: 10px; /* More rounded corners */
     background-color: #ffffff; /* White background for better contrast */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); /* Slightly deeper shadow */
   }
+
+     /* Simple modal styles */
+     .modal {
+      display: none; /* Hidden by default */
+      position: fixed; /* Stay in place */
+      z-index: 1; /* Sit on top */
+      left: 0;
+      top: 0;
+      width: 100%; /* Full width */
+      height: 100%; /* Full height */
+      overflow: auto; /* Enable scroll if needed */
+      background-color: rgba(0,0,0,0.4); /* Black with opacity */
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%; /* Can be adjusted */
+      max-height: 80%;
+      overflow-y: auto; /* Enable scrolling for large content */
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
   
   /* Title */
   h1 {
@@ -58,6 +95,7 @@
     border-radius: 5px; /* More rounded corners */
     font-weight: bold; /* Bold text */
     transition: background-color 0.3s, transform 0.3s; /* Smooth transition */
+    margin-right: 15px;
   }
   
   .btn:hover {
@@ -138,8 +176,10 @@
       display: block;
       width: 100%; /* Full width buttons */
       text-align: center;
-      margin: 10px 0;
+      margin: 10px 10px;
+      
     }
+
   }
   
   /* Additional styling for no items message */

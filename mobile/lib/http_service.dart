@@ -1,33 +1,3 @@
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-//
-// class HttpService {
-//   final String baseUrl = 'http://10.0.2.2:3000';
-//
-//   Future<void> sendQRCode(String itemId, String itemName, String qrCodeBase64) async {
-//     final url = Uri.parse('$baseUrl/api/mobile/history'); // Adjust endpoint as needed
-//     try {
-//       final response = await http.post(
-//         url,
-//         headers: {'Content-Type': 'application/json'},
-//         body: json.encode({
-//           'itemId': itemId,
-//           'itemName': itemName,
-//           'qrCode': qrCodeBase64,
-//         }),
-//       );
-//
-//       if (response.statusCode == 200) {
-//         print('Data sent successfully: ${response.body}');
-//       } else {
-//         print('Failed to send data. Status: ${response.statusCode}');
-//       }
-//     } catch (e) {
-//       print('Error sending data: $e');
-//     }
-//   }
-// }
-
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;

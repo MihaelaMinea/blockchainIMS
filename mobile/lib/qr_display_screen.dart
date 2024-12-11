@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class QRDisplayScreen extends StatelessWidget {
   final String responseBody;
 
-  const QRDisplayScreen({Key? key, required this.responseBody}) : super(key: key);
+  const QRDisplayScreen({super.key, required this.responseBody});
 
   @override
   Widget build(BuildContext context) {
@@ -121,12 +121,12 @@ class QRDisplayScreen extends StatelessWidget {
                             ],
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
               );
-            }).toList(),
+            }),
           ],
         ),
       ),

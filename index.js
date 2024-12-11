@@ -13,11 +13,7 @@ import connectDB from './config/db.js';
 import './config/db.js'; // This ensures the db file is executed, including environment variable loading and logging
 import { connectToFabric, disconnectFromFabric } from './utils/fabricConnection.js';
 
-
-
-
 const app = express();
-
 app.use(logging); // Middleware - used to show concept
 app.use(morgan('dev')); // Logs requests to the console
 app.use(express.static('public'));

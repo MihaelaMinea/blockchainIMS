@@ -1,11 +1,12 @@
+
 doctype html
 html
   head
     title= title
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    link(rel="stylesheet" href="/css/items.css")   
-
+    link(rel="stylesheet", href="/css/items.css")
+     
   body
     .container
       h1 #{title}
@@ -16,6 +17,7 @@ html
           thead
             tr
               th Index
+              th ID
               th Name
               th Description
               th Supplier
@@ -23,10 +25,12 @@ html
               th Quantity
               th Category
               th Date Received
+              th Check History
           tbody
             each item, index in items
               tr
                 td #{index + 1} 
+                td= item._id 
                 td= item.name
                 td= item.description
                 td= item.supplier
@@ -34,10 +38,76 @@ html
                 td= item.quantity
                 td= item.category
                 td= new Date(item.dateReceived).toLocaleDateString()
+                td
+                  button(class="btn-view-history" data-item-id=item._id) History
+
       else
         p No items found in inventory. Please add some items.
       
       a(href="/api/items/new" class="btn") Add New Item
+      a(href="/auth/login" class="btn") Go to Login
+      
 
-       a(href="/auth/login" class="btn") Go to Login
-      a(href="/api/welcome" class="btn") Go to Welcome Page
+    // Modal for displaying the item history
+    div(id="historyModal", class="modal")
+      div(class="modal-content")
+        span(class="close") &times;
+        pre(id="historyContent") <!-- Preformatted text block for JSON -->
+
+    script.
+      document.addEventListener('DOMContentLoaded', function() {
+        // Select all 'History' buttons
+        const historyButtons = document.querySelectorAll('.btn-view-history');
+        const modal = document.getElementById('historyModal');
+        const modalContent = document.getElementById('historyContent');
+        const closeBtn = document.querySelector('.close');
+        
+        // Add click event listeners to each button
+        historyButtons.forEach(button => {
+          button.addEventListener('click', async function() {
+            const itemId = this.getAttribute('data-item-id'); // Get the item ID from the button
+
+            try {
+              // Fetch the history from the server
+              const response = await fetch(`/api/items/${itemId}/history`);
+              const data = await response.json();
+
+              // Check if there's no history and display a message with the current item data
+              if (!data.history || data.history.length === 0) {
+                modalContent.textContent = `No history available for item: ${itemId}\n\nCurrent Data:\n`;
+                modalContent.textContent += JSON.stringify({
+                  id: itemId,
+                  name: this.closest('tr').querySelector('td:nth-child(3)').textContent,
+                  description: this.closest('tr').querySelector('td:nth-child(4)').textContent,
+                  supplier: this.closest('tr').querySelector('td:nth-child(5)').textContent,
+                  price: this.closest('tr').querySelector('td:nth-child(6)').textContent,
+                  quantity: this.closest('tr').querySelector('td:nth-child(7)').textContent,
+                  category: this.closest('tr').querySelector('td:nth-child(8)').textContent,
+                  dateReceived: this.closest('tr').querySelector('td:nth-child(9)').textContent
+                }, null, 2);
+              } else {
+                // If history exists, display it
+                modalContent.textContent = JSON.stringify(data.history, null, 2);
+              }
+
+              modal.style.display = 'block'; // Show the modal
+            } catch (error) {
+              console.error('Error fetching history:', error);
+              modalContent.textContent = 'Error fetching history';
+              modal.style.display = 'block'; // Show the modal in case of error
+            }
+          });
+        });
+
+        // When the user clicks the close button, close the modal
+        closeBtn.addEventListener('click', function() {
+          modal.style.display = 'none'; // Hide the modal
+        });
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.addEventListener('click', function(event) {
+          if (event.target === modal) {
+            modal.style.display = 'none'; // Hide the modal if clicked outside
+          }
+        });
+      });

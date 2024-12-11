@@ -9,7 +9,7 @@ html
     .container
       h1 Inventory Management System
       p Welcome to #{message}! Please fill out the form below to add a new item to the inventory.
-
+      br
       form(action="/api/items" method="POST" class="inventory-form")
         .form-group
           label(for="itemName") Item Name
@@ -24,7 +24,7 @@ html
           input(type="text" id="supplier" name="supplier" placeholder="Enter supplier name" required)
 
         .form-group
-          label(for="price") Price ($)
+          label(for="price") Price (£)
           input(type="number" id="price" name="price" min="0" step="0.01" placeholder="Enter price" required)
 
         .form-group

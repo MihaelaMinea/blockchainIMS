@@ -1,4 +1,3 @@
-
 import express from 'express';
 import { generateItemQR } from '../api/mobileService.js';
 import { getItemHistory } from '../api/mobileService.js';
@@ -6,7 +5,6 @@ import fs from 'fs';
 import path from 'path';
 
 const router = express.Router();
-
 // Route to display the items and their QR codes
 router.get('/qrcodes', async (req, res) => {
     try {
@@ -49,9 +47,6 @@ router.get('/items/:itemId/history', async (req, res) => {
     }
 });
 
-
-
-
 // Route to handle item history retrieval
 router.post('/history', async (req, res) => {
     const { itemId, itemName, qrCode } = req.body;
@@ -70,8 +65,5 @@ router.post('/history', async (req, res) => {
         res.status(500).send({ error: error.message });
     }
 });
-
-
-
 export default router;
 

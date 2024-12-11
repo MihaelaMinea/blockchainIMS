@@ -148,4 +148,45 @@ button.btn-submit:hover {
     text-align: center;
     margin: 10px 0;
   }
+
+  /* Modal styles */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; /* Position fixed to the screen */
+  z-index: 1000; /* Ensure the modal is on top of other content */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  overflow: auto; /* Allow scrolling if the content overflows */
+  padding-top: 100px; /* Space from the top */
+}
+
+/* Modal content */
+.modal-content {
+  background-color: white;
+  margin: auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%; /* Set the width of the modal */
+  max-width: 800px; /* Max width to prevent it from being too large */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Close button (X) */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 }

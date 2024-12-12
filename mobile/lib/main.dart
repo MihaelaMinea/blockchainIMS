@@ -135,6 +135,8 @@ class _QRCodeScreenState extends State<QRCodeScreen> {
                                           ),
                                     ),
                                   );
+                                  print(
+                                      'Successful fetch history: ${response.body}');
                                 } else {
                                   print(
                                       'Failed to fetch history: ${response.body}');

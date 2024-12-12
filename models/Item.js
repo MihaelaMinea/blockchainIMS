@@ -28,6 +28,10 @@ class Item {
         quantity: Joi.number().positive().integer().required(),
         category: Joi.string().required(),
         dateReceived: Joi.string().isoDate().required(),
+        branch: Joi.string().valid('London', 'Amsterdam', 'Bucharest').required(),
+        userRole: Joi.string().valid('assistant', 'manager').required(),
+        userName: Joi.string().required(),
+    
     });
 
     // Get all items
@@ -78,8 +82,8 @@ class Item {
            //  Create a ledger entry for the new item
         const ledgerItem = {
             ...itemData,  // Copy all the fields from the original item
-            _id: createdId,  // Use the same ID as the state item
-            revState: createdRev,  // Store the _rev from the state item
+            stateId: createdId,  // Use the same ID as the state item
+            stateRev: createdRev,  // Store the _rev from the state item
             timestamp: new Date().toISOString(),
             action: 'create',
             type: 'ledger-item',  // Mark it as a ledger entry
@@ -153,6 +157,9 @@ class Item {
                 quantity: updatedItemFromState.quantity,
                 category: updatedItemFromState.category, 
                 dateReceived: updatedItemFromState.dateReceived,
+                branch: updatedItemFromState.branch, // New field
+                userRole: updatedItemFromState.userRole, // New field
+                userName: updatedItemFromState.userName, // New field
                 timestamp: new Date().toISOString(), // Add a timestamp for the ledger entry
                 action: 'update',  // Action type (for this case, 'update')
                 type: 'ledger-item',  // Mark it as a ledger entry
@@ -195,6 +202,10 @@ static async scrapItem(id, scrapDetails) {
             quantity: existingItem.quantity,
             category: existingItem.category,
             dateReceived: existingItem.dateReceived,
+            branch: existingItem.branch, // Include branch from the existing item
+            userRole: scrapDetails.userRole, // User role provided in scrapDetails
+            userName: scrapDetails.userName, // User name provided in scrapDetails
+            executor:scrapDetails.executor,
             action: 'scrapped', // Action type
             dateScrapped: scrapDetails.dateScrapped, // Date when scrapped
             timestamp: new Date().toISOString(), // Current timestamp

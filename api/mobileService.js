@@ -11,6 +11,126 @@ const couch = new NodeCouchDb({
     },
 });
 const ledgerDbName = process.env.COUCHDB_LEDGER_DB; // Database for ledger/history
+const stateDbName = process.env.COUCHDB_STATE_DB;  // e.g. 'state_ims'
+
+export const getItemHistory = async (itemId) => {
+    try {
+        if (!itemId) {
+            throw new Error('Invalid request: Missing item ID');
+        }
+
+        // Query the ledger database for the item's history
+        const ledgerResponse = await couch.get(ledgerDbName, '_all_docs', {
+            include_docs: true,
+            startkey: `${itemId}_`,
+            endkey: `${itemId}_\ufff0`,
+        });
+
+        const ledgerEntries = ledgerResponse.data.rows.map(row => row.doc);
+
+        if (ledgerEntries.length === 0) {
+            // Fetch the current state as fallback
+            try {
+                const stateResponse = await couch.get(stateDbName, itemId);
+                const stateItem = stateResponse.data;
+
+                logger.warn(`No ledger history found for item: ${itemId}. Returning current state.`);
+                return {
+                    ...stateItem,
+                    updates: [], // No updates since there's no history
+                };
+            } catch (stateError) {
+                logger.error(`Failed to fetch current state for item: ${itemId} from state database. Error: ${stateError.message}`);
+                throw stateError;
+            }
+        }
+
+        // Reassemble the ledger history
+        let stateItem = {
+            _id: itemId,
+            _rev: null,
+            name: '',
+            description: '',
+            supplier: '',
+            price: 0,
+            quantity: 0,
+            category: '',
+            dateReceived: '',
+            branch: '',
+            userRole: '',
+            userName: '',
+            updates: [],
+        };
+
+        let isInitialStateSet = false;
+
+        ledgerEntries.forEach(entry => {
+            const {
+                stateRev, name, description, supplier, price, quantity,
+                category, dateReceived, branch, userRole, userName,
+                action, timestamp
+            } = entry;
+
+            if (action === 'create' && !isInitialStateSet) {
+                Object.assign(stateItem, {
+                    _rev: stateRev,
+                    name,
+                    description,
+                    supplier,
+                    price,
+                    quantity,
+                    category,
+                    dateReceived,
+                    branch,
+                    userRole,
+                    userName,
+                });
+                isInitialStateSet = true;
+            }
+
+            if (action === 'update') {
+                stateItem.updates.push({
+                    _rev: stateRev,
+                    timestamp,
+                    changes: {
+                        name,
+                        description,
+                        supplier,
+                        price,
+                        quantity,
+                        category,
+                        dateReceived,
+                        branch,
+                        userRole,
+                        userName,
+                    },
+                });
+
+                Object.assign(stateItem, {
+                    name,
+                    description,
+                    supplier,
+                    price,
+                    quantity,
+                    category,
+                    dateReceived,
+                    branch,
+                    userRole,
+                    userName,
+                });
+            }
+        });
+
+        logger.info(`Successfully reassembled history for item: ${itemId}.`);
+        return stateItem;
+
+    } catch (error) {
+        logger.error(`Error retrieving item history for ${itemId}: ${error.message}`);
+        throw error;
+    }
+};
+
+
 
 // Function to generate base64 encoded QR code for each item in the database
 export const generateItemQR = async () => {
@@ -23,13 +143,17 @@ export const generateItemQR = async () => {
                 const qrCodeData = {
                     _id: item._id,  // Unique identifier for the item
                     _rev: item._rev,  // Revision ID for history tracking in CouchDB
-                    name: item.name,  // Item name
-                    description: item.description,  // Item description
-                    price: item.price,  // Item price
-                    quantity: item.quantity,  // Item quantity
-                    category: item.category,  // Item category
-                    dateReceived: item.dateReceived,  // Date item was received
-                    type:item.type
+                    name: item.name,  
+                    description: item.description,  
+                    supplier: item.supplier,
+                    price: item.price,  
+                    quantity: item.quantity,  
+                    category: item.category,  
+                    dateReceived: item.dateReceived,  
+                    type:item.type, 
+                    branch: item.branch,
+                    userRole: item.userRole,
+                    userName: item.userRole,
                 };
 
                 // Convert the item data into a base64-encoded QR code
@@ -54,113 +178,9 @@ export const generateItemQR = async () => {
  * @param {string} itemId - The unique identifier for the item.
  * @returns {Promise<Object>} - The reassembled state JSON for the item.
  */
-export const getItemHistory = async (itemId) => {
-    try {
-        if (!itemId) {
-            throw new Error('Invalid request: Missing item ID');
-        }
-        // Query the ledger database for the item's history based on its stateId
-        const response = await couch.get(ledgerDbName, '_all_docs', {
-            include_docs: true,
-            startkey: `${itemId}_`,  // Start from the first ledger entry for this item
-            endkey: `${itemId}_\ufff0`,  // End at the last ledger entry for this item
-        });
-        // Extract the ledger entries from the response
-        const ledgerEntries = response.data.rows.map(row => row.doc);
-
-        if (ledgerEntries.length === 0) {
-            throw new Error(`No history found for item: ${itemId}`);
-        }
 
 
 
-
-
-
-
-
-
-
-
-
-
-        // Reassemble the state format
-        let stateItem = {
-            _id: itemId,
-            _rev: null,  // Initialize _rev, this will be updated with the first create action
-            name: '',
-            description: '',
-            supplier: '',
-            price: 0,
-            quantity: 0,
-            category: '',
-            dateReceived: '',
-            updates: [],
-        };
-
-        // Apply each ledger entry to the stateItem, starting with the initial state
-        let isInitialStateSet = false;  // Flag to track if we have set the initial state with the first 'create' action
-
-        ledgerEntries.forEach(entry => {
-            const { stateId, stateRev, name, description, 
-                supplier, price, quantity, category, dateReceived, action } = entry;
-
-            if (action === 'create' && !isInitialStateSet) {
-                // This is the initial state, so set the state properties
-                stateItem._rev = stateRev;  // Set the revision for the state item
-                stateItem.name = name;
-                stateItem.description = description;
-                stateItem.supplier = supplier;
-                stateItem.price = price;
-                stateItem.quantity = quantity;
-                stateItem.category = category;
-                stateItem.dateReceived = dateReceived;
-
-                isInitialStateSet = true;  // Mark the initial state as set
-            }
-
-            // Add an entry for each update
-            if (action === 'update') {
-                stateItem.updates.push({
-                    _rev: stateRev,  // Use the _rev from the update action
-                    timestamp: entry.timestamp,
-                    changes: {
-                        name,
-                        description,
-                        supplier,
-                        price,
-                        quantity,
-                        category,
-                        dateReceived,
-                    },
-                });
-
-                // Update the state item with the latest changes (important to keep it consistent)
-                stateItem.name = name;
-                stateItem.description = description;
-                stateItem.supplier = supplier;
-                stateItem.price = price;
-                stateItem.quantity = quantity;
-                stateItem.category = category;
-                stateItem.dateReceived = dateReceived;
-            }
-        });
-
-        // Remove any fields that might still be `null` (this is just a cleanup step)
-        Object.keys(stateItem).forEach(key => {
-            if (stateItem[key] === null || stateItem[key] === undefined) {
-                delete stateItem[key];
-            }
-        });
-
-        // Return the reassembled state JSON with the updates
-        logger.info(`Successfully reassembled history for item: ${itemId}. State: ${JSON.stringify(stateItem)}`);
-        return stateItem;
-    } catch (error) {
-        logger.error(`Error retrieving item history: ${error.message}`);
-        throw error; 
-    }
-};
 
 
 

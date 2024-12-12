@@ -59,6 +59,7 @@ router.post('/history', async (req, res) => {
 
     try {
         const history = await getItemHistory(itemId);
+        console.log('Item history for mobile: ', {history});
         res.status(200).send({ itemId, itemName, history });
     } catch (error) {
         console.error('Error processing history request:', error.message);

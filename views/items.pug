@@ -6,7 +6,13 @@ html
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     link(rel="stylesheet", href="/css/items.css")
-     
+    style.
+      /* CSS to handle long IDs and wrap them */
+      .id-cell span {
+        display: inline-block;
+        word-wrap: break-word;
+        max-width: 150px; /* Adjust as necessary */
+      }
   body
     .container
       h1 #{title}
@@ -25,12 +31,15 @@ html
               th Quantity
               th Category
               th Date Received
+              th Branch
+              th Use Role
+              th User Name
               th Check History
           tbody
             each item, index in items
               tr
                 td #{index + 1} 
-                td= item._id 
+                td.id-cell: span= item._id 
                 td= item.name
                 td= item.description
                 td= item.supplier
@@ -38,6 +47,9 @@ html
                 td= item.quantity
                 td= item.category
                 td= new Date(item.dateReceived).toLocaleDateString()
+                td= item.branch || 'N/A'
+                td= item.useRole || 'N/A'
+                td= item.userName || 'N/A'
                 td
                   button(class="btn-view-history" data-item-id=item._id) History
 
@@ -45,8 +57,12 @@ html
         p No items found in inventory. Please add some items.
       
       a(href="/api/items/new" class="btn") Add New Item
+      a(href="/api/items/update" class="btn") Update Existing Item
+      a(href="/api/items/scrap" class="btn") Scrap Asset
+      a(href=`/api/dashboard/${userRole}` class="btn") Go to Dashboard
       a(href="/auth/login" class="btn") Go to Login
-      
+        
+
 
     // Modal for displaying the item history
     div(id="historyModal", class="modal")
@@ -61,6 +77,7 @@ html
         const modal = document.getElementById('historyModal');
         const modalContent = document.getElementById('historyContent');
         const closeBtn = document.querySelector('.close');
+        
         
         // Add click event listeners to each button
         historyButtons.forEach(button => {
@@ -83,7 +100,10 @@ html
                   price: this.closest('tr').querySelector('td:nth-child(6)').textContent,
                   quantity: this.closest('tr').querySelector('td:nth-child(7)').textContent,
                   category: this.closest('tr').querySelector('td:nth-child(8)').textContent,
-                  dateReceived: this.closest('tr').querySelector('td:nth-child(9)').textContent
+                  dateReceived: this.closest('tr').querySelector('td:nth-child(9)').textContent,
+                  branch: this.closest('tr').querySelector('td:nth-child(10)')?.textContent || 'N/A',
+                  useRole: this.closest('tr').querySelector('td:nth-child(11)')?.textContent || 'N/A',
+                  userName: this.closest('tr').querySelector('td:nth-child(12)')?.textContent || 'N/A'
                 }, null, 2);
               } else {
                 // If history exists, display it
@@ -111,3 +131,4 @@ html
           }
         });
       });
+

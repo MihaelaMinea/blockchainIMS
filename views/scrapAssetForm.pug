@@ -21,41 +21,54 @@ html
 
         .form-group
           label(for="itemName") Item Name
-          input(type="text" id="itemName" name="name" placeholder="Enter item name" required)
+          input(type="text" id="itemName" name="name" placeholder="Enter item name" readonly)
 
         .form-group
           label(for="description") Description
-          textarea(id="description" name="description" rows="3" placeholder="Enter item description" required)
+          textarea(id="description" name="description" rows="3" placeholder="Enter item description" readonly)
 
         .form-group
           label(for="supplier") Supplier
-          input(type="text" id="supplier" name="supplier" placeholder="Enter supplier name" required)
+          input(type="text" id="supplier" name="supplier" placeholder="Enter supplier name" readonly)
 
         .form-group
           label(for="price") Price (£)
-          input(type="number" id="price" name="price" min="0" step="0.01" placeholder="Enter price" required)
+          input(type="number" id="price" name="price" min="0" step="0.01" placeholder="Enter price" readonly)
 
         .form-group
           label(for="quantity") Quantity
-          input(type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity" required)
+          input(type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity" readonly)
 
         .form-group
           label(for="category") Category
-          select(id="category" name="category")
+          select(id="category" name="category" disabled)
             option(value="electronics") Electronics
             option(value="furniture") Furniture
-            option(value="stationery") Stationery
-            option(value="clothing") Clothing
-            option(value="food") Food
             option(value="other") Other
 
         .form-group
           label(for="dateReceived") Date Received
-          input(type="date" id="dateReceived" name="dateReceived" required)
+          input(type="date" id="dateReceived" name="dateReceived" readonly)
 
         .form-group
           label(for="dateScrapped") Date Scrapped
           input(type="date" id="dateScrapped" name="dateScrapped" readonly)
+
+        .form-group
+          label(for="branch") Branch
+          input(type="text" id="branch" name="branch" placeholder="Enter branch location" required)
+
+        .form-group
+          label(for="userRole") User Role
+          input(type="text" id="userRole" name="userRole" placeholder="Enter user role" required)
+
+        .form-group
+          label(for="userName") User Name
+          input(type="text" id="userName" name="userName" placeholder="Enter user name" required)
+
+        .form-group
+          label(for="executor") Executor
+          input(type="text" id="executor" name="executor" value="Chartered Accountant J. W. Smith" readonly)
 
         button(type="submit" class="btn-submit") Scrap Item
 
@@ -74,6 +87,9 @@ html
               document.getElementById('quantity').value = data.quantity || '';
               document.getElementById('category').value = data.category || '';
               document.getElementById('dateReceived').value = data.dateReceived || '';
+               document.getElementById('branch').value = data.branch || '';
+              document.getElementById('userRole').value = data.userRole || '';
+              document.getElementById('userName').value = data.userName || '';
             }
             // Automatically fill current date for dateScrapped
             document.getElementById('dateScrapped').value = new Date().toISOString().split('T')[0];

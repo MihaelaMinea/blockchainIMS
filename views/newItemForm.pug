@@ -1,3 +1,4 @@
+
 doctype html
 html
   head
@@ -36,13 +37,33 @@ html
           select(id="category" name="category")
             option(value="electronics") Electronics
             option(value="furniture") Furniture
-            option(value="stationery") Stationery
-            option(value="clothing") Clothing
-            option(value="food") Food
             option(value="other") Other
 
         .form-group
           label(for="dateReceived") Date Received
           input(type="date" id="dateReceived" name="dateReceived" required)
+
+        .form-group
+          label(for="branch") Branch
+          select(id="branch" name="branch")
+            option(value="London") London
+            option(value="Amsterdam") Amsterdam
+            option(value="Bucharest") Bucharest
+
+        .form-group
+          label(for="userRole") User Role
+          select(id="userRole" name="userRole")
+            option(value="assistant") Assistant
+            option(value="manager") Manager
+
+        .form-group
+          label(for="userName") User Name
+          select(id="userName" name="userName")
+            option(value="Johana Gratified") Johana Gratified
+            option(value="John Doe") John Doe
+            option(value="Carla Baltimore") Carla Baltimore
+            option(value="Samuel Everett") Samuel Everett
+            option(value="Linda Grace") Linda Grace
+            option(value="Michael Porter") Michael Porter
 
         button(type="submit" class="btn-submit") Add Item

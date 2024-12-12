@@ -1,3 +1,81 @@
+//- doctype html
+//- html
+//-   head
+//-     title= title
+//-     meta(charset="UTF-8")
+//-     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+//-     link(rel="stylesheet", href="/styles.css")
+//-   body
+//-     .container
+//-       h1 Inventory Management System
+//-       p Welcome to #{message}! Please update the selected item below.
+
+//-       form(action="/api/items/update" method="POST" class="inventory-form")
+//-         .form-group
+//-           label(for="itemId") Select Item ID
+//-           select(id="itemId" name="itemId" required onchange="fetchItemData(this.value)")
+//-             option(value="" disabled selected) Choose an item...
+//-             each item in items
+//-               option(value=item._id)= item._id
+
+//-         .form-group
+//-           label(for="itemName") Item Name
+//-           input(type="text" id="itemName" name="name" placeholder="Enter item name" required)
+
+//-         .form-group
+//-           label(for="description") Description
+//-           textarea(id="description" name="description" rows="3" placeholder="Enter item description" required)
+
+//-         .form-group
+//-           label(for="supplier") Supplier
+//-           input(type="text" id="supplier" name="supplier" placeholder="Enter supplier name" required)
+
+//-         .form-group
+//-           label(for="price") Price ($)
+//-           input(type="number" id="price" name="price" min="0" step="0.01" placeholder="Enter price" required)
+
+//-         .form-group
+//-           label(for="quantity") Quantity
+//-           input(type="number" id="quantity" name="quantity" min="1" placeholder="Enter quantity" required)
+
+//-         .form-group
+//-           label(for="category") Category
+//-           select(id="category" name="category")
+//-             option(value="electronics") Electronics
+//-             option(value="furniture") Furniture
+//-             option(value="stationery") Stationery
+//-             option(value="clothing") Clothing
+//-             option(value="food") Food
+//-             option(value="other") Other
+
+//-         .form-group
+//-           label(for="dateReceived") Date Received
+//-           input(type="date" id="dateReceived" name="dateReceived" required)
+
+//-         button(type="submit" class="btn-submit") Update Item
+
+//-       script.
+//-         async function fetchItemData(itemId) {
+//-           if (!itemId) return;
+
+//-           try {
+//-             const response = await fetch(`/api/items/${itemId}`);
+//-             const data = await response.json();
+//-             if (data) {
+//-               document.getElementById('itemName').value = data.name || '';
+//-               document.getElementById('description').value = data.description || '';
+//-               document.getElementById('supplier').value = data.supplier || '';
+//-               document.getElementById('price').value = data.price || '';
+//-               document.getElementById('quantity').value = data.quantity || '';
+//-               document.getElementById('category').value = data.category || '';
+//-               document.getElementById('dateReceived').value = data.dateReceived || '';
+//-             }
+//-           } catch (err) {
+//-             console.error('Error fetching item data:', err);
+//-           }
+//-         }
+
+
 doctype html
 html
   head
@@ -31,7 +109,7 @@ html
           input(type="text" id="supplier" name="supplier" placeholder="Enter supplier name" required)
 
         .form-group
-          label(for="price") Price ($)
+          label(for="price") Price (£)
           input(type="number" id="price" name="price" min="0" step="0.01" placeholder="Enter price" required)
 
         .form-group
@@ -52,6 +130,29 @@ html
           label(for="dateReceived") Date Received
           input(type="date" id="dateReceived" name="dateReceived" required)
 
+        .form-group
+          label(for="branch") Branch
+          select(id="branch" name="branch")
+            option(value="London") London
+            option(value="Amsterdam") Amsterdam
+            option(value="Bucharest") Bucharest
+
+        .form-group
+          label(for="userRole") User Role
+          select(id="userRole" name="userRole")
+            option(value="assistant") Assistant
+            option(value="manager") Manager
+
+        .form-group
+          label(for="userName") User Name
+          select(id="userName" name="userName")
+            option(value="Johana Gratified") Johana Gratified
+            option(value="John Doe") John Doe
+            option(value="Carla Baltimore") Carla Baltimore
+            option(value="Samuel Everett") Samuel Everett
+            option(value="Linda Grace") Linda Grace
+            option(value="Michael Porter") Michael Porter
+
         button(type="submit" class="btn-submit") Update Item
 
       script.
@@ -69,6 +170,9 @@ html
               document.getElementById('quantity').value = data.quantity || '';
               document.getElementById('category').value = data.category || '';
               document.getElementById('dateReceived').value = data.dateReceived || '';
+              document.getElementById('branch').value = data.branch || '';
+              document.getElementById('userRole').value = data.userRole || '';
+              document.getElementById('userName').value = data.userName || '';
             }
           } catch (err) {
             console.error('Error fetching item data:', err);

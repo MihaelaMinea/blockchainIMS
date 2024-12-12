@@ -19,106 +19,68 @@ const ledgerDbName = process.env.COUCHDB_LEDGER_DB; // Database for ledger/histo
 
 // Route to get item history by itemId 
 router.get('/:itemId/history', async (req, res) => {
-    const { itemId } = req.params; // Extract itemId from the URL parameters
+    const { itemId } = req.params;
 
     try {
         if (!itemId) {
             throw new Error('Invalid request: Missing item ID');
         }
 
-        // Query the ledger database for the item's history based on its stateId
+        // Query the ledger database for the item's history
         const response = await couch.get(ledgerDbName, '_all_docs', {
             include_docs: true,
-            startkey: `${itemId}_`,  // Start from the first ledger entry for this item
-            endkey: `${itemId}_\ufff0`,  // End at the last ledger entry for this item
+            startkey: `${itemId}_`,  // Start key for this item's ledger entries
+            endkey: `${itemId}_\ufff0`,  // End key for this item's ledger entries
         });
 
-        // Extract the ledger entries from the response
         const ledgerEntries = response.data.rows.map(row => row.doc);
 
         if (ledgerEntries.length === 0) {
-            throw new Error(`No history found for item: ${itemId}`);
+            // Fetch current state from state database as fallback
+            const stateResponse = await couch.get(stateDbName, itemId);
+            const stateItem = stateResponse.data;
+
+            logger.warn(`No ledger history found for item: ${itemId}. Returning current state.`);
+            return res.json({
+                history: {
+                    ...stateItem,
+                    updates: [], // No updates since there's no history
+                },
+            });
         }
 
-        // Reassemble the state format
+        // Reassemble history (existing logic for assembling stateItem from ledgerEntries)
         let stateItem = {
             _id: itemId,
-            _rev: null,  // Initialize _rev, this will be updated with the first create action
-            name: '',
-            description: '',
-            supplier: '',
-            price: 0,
-            quantity: 0,
-            category: '',
-            dateReceived: '',
             updates: [],
         };
-
-        // Apply each ledger entry to the stateItem, starting with the initial state
-        let isInitialStateSet = false;  // Flag to track if we have set the initial state with the first 'create' action
+        let isInitialStateSet = false;
 
         ledgerEntries.forEach(entry => {
-            const { stateId, stateRev, name, description, supplier, price, quantity, category, dateReceived, action } = entry;
-
-            if (action === 'create' && !isInitialStateSet) {
-                // This is the initial state, so set the state properties
-                stateItem._rev = stateRev;  // Set the revision for the state item
-                stateItem.name = name;
-                stateItem.description = description;
-                stateItem.supplier = supplier;
-                stateItem.price = price;
-                stateItem.quantity = quantity;
-                stateItem.category = category;
-                stateItem.dateReceived = dateReceived;
-
-                isInitialStateSet = true;  // Mark the initial state as set
-            }
-
-            // Add an entry for each update
-            if (action === 'update') {
-                stateItem.updates.push({
-                    _rev: stateRev,  // Use the _rev from the update action
-                    timestamp: entry.timestamp,
-                    changes: {
-                        name,
-                        description,
-                        supplier,
-                        price,
-                        quantity,
-                        category,
-                        dateReceived,
-                    },
+            if (entry.action === 'create' && !isInitialStateSet) {
+                Object.assign(stateItem, {
+                    ...entry,
+                    _rev: entry.stateRev,
                 });
+                isInitialStateSet = true;
+            }
 
-                // Update the state item with the latest changes (important to keep it consistent)
-                stateItem.name = name;
-                stateItem.description = description;
-                stateItem.supplier = supplier;
-                stateItem.price = price;
-                stateItem.quantity = quantity;
-                stateItem.category = category;
-                stateItem.dateReceived = dateReceived;
+            if (entry.action === 'update') {
+                stateItem.updates.push({
+                    _rev: entry.stateRev,
+                    timestamp: entry.timestamp,
+                    changes: { ...entry },
+                });
             }
         });
 
-        // Remove any fields that might still be `null` (this is just a cleanup step)
-        Object.keys(stateItem).forEach(key => {
-            if (stateItem[key] === null || stateItem[key] === undefined) {
-                delete stateItem[key];
-            }
-        });
-
-        // Return the reassembled state JSON with the updates
-        logger.info(`Successfully reassembled history for item: ${itemId}. State: ${JSON.stringify(stateItem)}`);
         res.json({ history: stateItem });
 
     } catch (error) {
-        logger.error(`Failed to load history for item ${itemId}: ${error.message}`);
+        logger.error(`Failed to retrieve history for item ${itemId}: ${error.message}`);
         res.status(500).json({ error: 'Error retrieving item history' });
     }
 });
-
-
 
 // Render the form for adding a new item
 router.get('/new', (req, res) => {
@@ -147,18 +109,22 @@ router.get('/scrap', async (req, res) => {
     }
 });
 
+
 // Route to render the dashboard with items and their index
 router.get('/', async (req, res) => {
-    
     try {
         const items = await Item.getItems();
-        console.log(items)
-        res.render('items', { items });
+        const userRole = req.session.user?.role || 'guest'; // Get the role from the session, default to 'guest' if not found
+       console.log(userRole)
+        console.log(items);
+        
+        res.render('items', { items, userRole }); // Pass items and userRole to the template
     } catch (err) {
         console.error('Error fetching items:', err);
         res.status(500).send('Server Error');
     }
 });
+
 
 //  Route to fetch item data for populating the form
 // Fetch item data by ID
@@ -183,7 +149,10 @@ router.post('/', async (req, res) => {
         price: Joi.number().min(0).required(),
         quantity: Joi.number().min(1).required(),
         category: Joi.string().required(),
-        dateReceived: Joi.date().required()
+        dateReceived: Joi.date().required(),
+        branch: Joi.string().valid('London', 'Amsterdam', 'Bucharest').required(),
+        userRole: Joi.string().valid('assistant', 'manager').required(),
+        userName: Joi.string().required(),
     });
 
     const itemRequest = schema.validate(req.body);
@@ -198,8 +167,12 @@ router.post('/', async (req, res) => {
         price: req.body.price,
         quantity: req.body.quantity,
         category: req.body.category,
-        dateReceived: req.body.dateReceived
+        dateReceived: req.body.dateReceived,
+        branch: req.body.branch, // New field for branch
+        userRole: req.body.userRole, // New field for user role
+        userName: req.body.userName, // New field for user name
     };
+    
 
     try {
         await Item.createItem(itemData); // Save item to CouchDB
@@ -211,7 +184,7 @@ router.post('/', async (req, res) => {
 
 // Update an existing item
 router.post('/update', async (req, res) => {
-    const { itemId, name, description, supplier, price, quantity, category, dateReceived } = req.body;
+    const { itemId, name, description, supplier, price, quantity, category, dateReceived, branch, userRole, userName } = req.body;
 
     if (!itemId) {
         return res.status(400).send('Item ID is required');
@@ -225,6 +198,9 @@ router.post('/update', async (req, res) => {
         quantity: Number(quantity),
         category,
         dateReceived,
+        branch, // New field
+        userRole, // New field
+        userName, // New field
     };
 
     try {
@@ -236,21 +212,11 @@ router.post('/update', async (req, res) => {
     }
 });
 
-// Route to delete an item
-router.post('/delete/:id', async (req, res) => {
-    try {
-        await Item.deleteItem(req.params.id);
-        res.redirect('/api/items'); // Redirect to dashboard after deletion
-    } catch (err) {
-        console.error('Error deleting item:', err);
-        res.status(500).send('Error deleting item from the database');
-    }
-});
 
 
 // Scrap an existing item
 router.post('/scrap', async (req, res) => {
-    const { itemId, dateScrapped } = req.body;
+    const { itemId, dateScrapped, executor } = req.body;
 
     // Validate input
     if (!itemId || !dateScrapped) {
@@ -258,7 +224,7 @@ router.post('/scrap', async (req, res) => {
     }
 
     try {
-        const scrapDetails = { dateScrapped }; // Create the scrap details object
+        const scrapDetails = { dateScrapped , executor}; // Create the scrap details object
         const result = await Item.scrapItem(itemId, scrapDetails);
 
         console.log('Scrap result:', result);

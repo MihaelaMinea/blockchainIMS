@@ -1,36 +1,59 @@
-# do not touch! it is working after 3 days :)
-version: '3'
+
+networks:
+  fabric_custom:   # Define the custom network explicitly
+    driver: bridge # Use the bridge network driver (default)
+
 services:
-  # Node.js application
-  node:
+  # Node.js application for blockchainIMS_v3
+  node_v3:
     build: .
-    container_name: node-app
+    container_name: node-v3-app
     ports:
-      - "3000:3000"  # Host port 3000 mapped to container port 3000
+      - "3001:3000"  # Map host port 3001 to container port 3000
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: password
-      COUCHDB_HOST: couchdb
+      COUCHDB_HOST: couchdb_v3  # CouchDB instance
       COUCHDB_PORT: 5984
-      COUCHDB_STATE_DB: state_ims
-      COUCHDB_LEDGER_DB: ledger_ims
+      COUCHDB_STATE_DB: state_ims_v3
+      COUCHDB_LEDGER_DB: ledger_ims_v3
       PORT: 3000
       HOST: 0.0.0.0
+    networks:
+      - fabric_custom
     depends_on:
-      - couchdb  # This ensures CouchDB starts first
+      - couchdb_v3
 
-  # CouchDB container
-  couchdb:
+  # Independent CouchDB instance for blockchainIMS_v3
+  couchdb_v3:
     image: couchdb:3.4.2
-    container_name: couchdb
+    container_name: couchdb_v3
     ports:
-      - "6984:5984"  # Expose CouchDB on port 6984
+      - "5983:5984"  # Map CouchDB to host port 5983
     environment:
       COUCHDB_USER: admin
       COUCHDB_PASSWORD: password
     volumes:
-      - couchdb_data:/opt/couchdb/data  # Persist data between restarts
+      - couchdb_v3_data:/opt/couchdb/data  # Persist data
+    networks:
+      - fabric_custom
 
-# Volumes to persist CouchDB data
+  # Fabric CA service for registering users
+  fabric-ca:
+    image: hyperledger/fabric-ca:latest
+    container_name: fabric-ca
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_PORT=7054
+    ports:
+      - "4444:7054"  # Map CA server port to 4444
+    volumes:
+      - fabric-ca-server-volume:/etc/hyperledger/fabric-ca-server
+      - ./certs:/fabric-network/certs  # Mount local certs folder
+    networks:
+      - fabric_custom
+    command: sh -c 'fabric-ca-server start -b admin:adminpw'
+
 volumes:
-  couchdb_data:
+  couchdb_v3_data:  # Volume for CouchDB instance
+  fabric-ca-server-volume:  # Volume for Fabric CA

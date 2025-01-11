@@ -129,35 +129,90 @@ class ItemContract extends Contract {
         console.info(`Item ${itemId} scrapped successfully`);
     }
 
-    // Query item history
-    async getItemHistory(ctx, itemId) {
-        console.info(`Fetching history for item ${itemId}`);
-        const historyIterator = await ctx.stub.getHistoryForKey(itemId);
+    // // Query item history
+    // async getItemHistory(ctx, itemId) {
+    //     console.info(`Fetching history for item ${itemId}`);
+    //     const historyIterator = await ctx.stub.getHistoryForKey(itemId);
+    //     const history = [];
+    //     let result = await historyIterator.next();
+
+    //     while (!result.done) {
+    //         if (result.value) {
+    //             const record = {
+    //                 txId: result.value.txId,
+    //                 timestamp: result.value.timestamp,
+    //                 data: JSON.parse(result.value.value.toString('utf8')),
+    //             };
+    //             history.push(record);
+    //         }
+    //         result = await historyIterator.next();
+    //     }
+    //     await historyIterator.close();
+
+    //     console.info(`History for item ${itemId}:`, history);
+    //     return JSON.stringify(history);
+    // }
+
+    // // Utility method: Check if item exists
+    // async itemExists(ctx, itemId) {
+    //     const itemBuffer = await ctx.stub.getState(itemId);
+    //     return itemBuffer && itemBuffer.length > 0;
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Method to get item history using the ctx (Hyperledger Fabric context)
+async getItemHistory(ctx, itemId) {
+    console.info(`Fetching history for item ${itemId}`);
+
+    try {
+        // Use the getHistoryForKey method from the context to access the item's history in the ledger
+        const historyIterator = await ctx.stub.getHistoryForKey(itemId); // Fetch historical data from the ledger
         const history = [];
         let result = await historyIterator.next();
 
+        // Iterate through the history results
         while (!result.done) {
             if (result.value) {
+                // Process each ledger entry to extract relevant details
                 const record = {
-                    txId: result.value.txId,
-                    timestamp: result.value.timestamp,
-                    data: JSON.parse(result.value.value.toString('utf8')),
+                    txId: result.value.txId,             // Transaction ID for the change
+                    timestamp: result.value.timestamp,    // Timestamp of the transaction
+                    data: JSON.parse(result.value.value.toString('utf8')),  // The item state at the time of the transaction
+                    _rev: result.value.value.toString('utf8')._rev || '' // _rev from CouchDB state
                 };
                 history.push(record);
             }
-            result = await historyIterator.next();
+            result = await historyIterator.next();  // Move to the next history entry
         }
+
+        // Close the iterator once all history records are processed
         await historyIterator.close();
 
         console.info(`History for item ${itemId}:`, history);
-        return JSON.stringify(history);
-    }
+        return JSON.stringify(history);  // Return the assembled history as a JSON string
 
-    // Utility method: Check if item exists
-    async itemExists(ctx, itemId) {
-        const itemBuffer = await ctx.stub.getState(itemId);
-        return itemBuffer && itemBuffer.length > 0;
+    } catch (error) {
+        console.error(`Failed to fetch item history from ledger for ${itemId}: ${error.message}`);
+        return JSON.stringify({ error: `Error retrieving item history: ${error.message}` });
     }
 }
 
+
+}
+
 module.exports = ItemContract;
+
+
+
+
